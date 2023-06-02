@@ -55,6 +55,67 @@ public class UserRepository : IUserRepository
         };
     }
 
+    public async Task<User> GetByLoginAsync(string login, CancellationToken cancellationToken)
+    {
+        var dbModel =
+            await _context.Users.FirstOrDefaultAsync(model => model.Login == login, cancellationToken) ??
+            throw new EntityNotFoundException($"User with login: {login} is not found!");
+
+        return new User
+        {
+            Id = dbModel.Id,
+            Name = dbModel.Name,
+            Login = dbModel.Login,
+            Email = dbModel.Email,
+            Password = dbModel.Password,
+            DateOfBirth = dbModel.DateOfBirth,
+            GroupIds = dbModel.Groups
+                .Select(model => model.Id)
+                .ToList()
+        };
+    }
+
+    public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var dbModel =
+            await _context.Users.FirstOrDefaultAsync(model => model.Email == email, cancellationToken) ??
+            throw new EntityNotFoundException($"User with email: {email} is not found!");
+
+        return new User
+        {
+            Id = dbModel.Id,
+            Name = dbModel.Name,
+            Login = dbModel.Login,
+            Email = dbModel.Email,
+            Password = dbModel.Password,
+            DateOfBirth = dbModel.DateOfBirth,
+            GroupIds = dbModel.Groups
+                .Select(model => model.Id)
+                .ToList()
+        };
+    }
+
+    public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Users.FirstOrDefaultAsync(model => model.Id == id, cancellationToken);
+
+        return dbModel is not null;
+    }
+
+    public async Task<bool> ExistsWithLoginAsync(string login, CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Users.FirstOrDefaultAsync(model => model.Login == login, cancellationToken);
+
+        return dbModel is not null;
+    }
+
+    public async Task<bool> ExistsWithEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Users.FirstOrDefaultAsync(model => model.Email == email, cancellationToken);
+
+        return dbModel is not null;
+    }
+
     public async Task UpdateAsync(User user, CancellationToken cancellationToken)
     {
         var dbModel =

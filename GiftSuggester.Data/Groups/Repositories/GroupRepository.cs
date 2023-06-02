@@ -71,6 +71,13 @@ public class GroupRepository : IGroupRepository
         };
     }
 
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Groups.FirstOrDefaultAsync(model => model.Id == id, cancellationToken);
+
+        return dbModel is not null;
+    }
+
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var dbModel = await _context.Groups.FirstOrDefaultAsync(dbModel => dbModel.Id == id, cancellationToken) ??
