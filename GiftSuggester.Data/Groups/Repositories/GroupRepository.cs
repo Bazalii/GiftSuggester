@@ -23,6 +23,7 @@ public class GroupRepository : IGroupRepository
                 new GroupDbModel
                 {
                     Id = group.Id,
+                    Name = group.Name,
                     OwnerId = group.OwnerId,
                     Members = group.Members
                         .Select(member => _context.Users.First(user => user.Id == member.Id))

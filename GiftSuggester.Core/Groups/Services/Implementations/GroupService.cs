@@ -1,7 +1,6 @@
 ﻿using GiftSuggester.Core.CommonClasses;
 using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Repositories;
-using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Repositories;
 
 namespace GiftSuggester.Core.Groups.Services.Implementations;
@@ -12,7 +11,10 @@ public class GroupService : IGroupService
     private readonly IGroupRepository _groupRepository;
     private readonly IUserRepository _userRepository;
 
-    public GroupService(IUnitOfWork unitOfWork, IGroupRepository groupRepository, IUserRepository userRepository)
+    public GroupService(
+        IUnitOfWork unitOfWork,
+        IGroupRepository groupRepository,
+        IUserRepository userRepository)
     {
         _unitOfWork = unitOfWork;
         _groupRepository = groupRepository;
@@ -21,14 +23,15 @@ public class GroupService : IGroupService
 
     public async Task AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken)
     {
-        var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
-
         var group = new Group
         {
             Id = Guid.NewGuid(),
-            OwnerId = creationModel.OwnerId,
-            Members = new List<User> { owner }
+            Name = creationModel.Name,
+            OwnerId = creationModel.OwnerId
         };
+        
+        var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
+        group.Members.Add(owner);
 
         await _groupRepository.AddAsync(group, cancellationToken);
 

@@ -25,6 +25,7 @@ public class GroupController
         return _groupService.AddAsync(
             new GroupCreationModel
             {
+                Name = creationRequest.Name,
                 OwnerId = creationRequest.OwnerId
             }, cancellationToken);
     }
