@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GiftSuggester.Data.Migrations
 {
     [DbContext(typeof(GiftSuggesterContext))]
-    [Migration("20230523210600_Initial")]
+    [Migration("20230602202639_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -65,6 +65,11 @@ namespace GiftSuggester.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid")
                         .HasColumnName("owner_id");
@@ -108,6 +113,14 @@ namespace GiftSuggester.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
+
+                    b.HasIndex("Login")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_login");
 
                     b.ToTable("users", (string)null);
                 });

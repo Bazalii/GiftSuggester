@@ -31,6 +31,7 @@ namespace GiftSuggester.Data.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
                     owner_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -82,6 +83,18 @@ namespace GiftSuggester.Data.Migrations
                 name: "ix_groups_users_members_id",
                 table: "groups_users",
                 column: "members_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email",
+                table: "users",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_login",
+                table: "users",
+                column: "login",
+                unique: true);
         }
 
         /// <inheritdoc />
