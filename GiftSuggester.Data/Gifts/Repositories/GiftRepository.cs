@@ -64,6 +64,15 @@ public class GiftRepository : IGiftRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<bool> ExistsWithNameForRecipientAsync(string name, Guid recipientId,
+                                                            CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Gifts.FirstOrDefaultAsync(
+            model => model.Name == name && model.RecipientId == recipientId, cancellationToken);
+
+        return dbModel is not null;
+    }
+
     public async Task UpdateAsync(Gift gift, CancellationToken cancellationToken)
     {
         var dbModel = await _context.Gifts.FirstOrDefaultAsync(dbModel => dbModel.Id == gift.Id, cancellationToken) ??

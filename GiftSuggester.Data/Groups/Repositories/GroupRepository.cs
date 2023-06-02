@@ -23,6 +23,7 @@ public class GroupRepository : IGroupRepository
                 new GroupDbModel
                 {
                     Id = group.Id,
+                    Name = group.Name,
                     OwnerId = group.OwnerId,
                     Members = group.Members
                         .Select(member => _context.Users.First(user => user.Id == member.Id))
@@ -69,6 +70,13 @@ public class GroupRepository : IGroupRepository
                     })
                 .ToList()
         };
+    }
+
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Groups.FirstOrDefaultAsync(model => model.Id == id, cancellationToken);
+
+        return dbModel is not null;
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)

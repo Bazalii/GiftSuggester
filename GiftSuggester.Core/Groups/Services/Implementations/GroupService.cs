@@ -1,7 +1,7 @@
-﻿using GiftSuggester.Core.CommonClasses;
+﻿using FluentValidation;
+using GiftSuggester.Core.CommonClasses;
 using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Repositories;
-using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Repositories;
 
 namespace GiftSuggester.Core.Groups.Services.Implementations;
@@ -11,24 +11,33 @@ public class GroupService : IGroupService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGroupRepository _groupRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IValidator<Group> _groupValidator;
 
-    public GroupService(IUnitOfWork unitOfWork, IGroupRepository groupRepository, IUserRepository userRepository)
+    public GroupService(
+        IUnitOfWork unitOfWork,
+        IGroupRepository groupRepository,
+        IUserRepository userRepository,
+        IValidator<Group> groupValidator)
     {
         _unitOfWork = unitOfWork;
         _groupRepository = groupRepository;
         _userRepository = userRepository;
+        _groupValidator = groupValidator;
     }
 
     public async Task AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken)
     {
-        var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
-
         var group = new Group
         {
             Id = Guid.NewGuid(),
-            OwnerId = creationModel.OwnerId,
-            Members = new List<User> { owner }
+            Name = creationModel.Name,
+            OwnerId = creationModel.OwnerId
         };
+
+        await _groupValidator.ValidateAndThrowAsync(group, cancellationToken);
+
+        var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
+        group.Members.Add(owner);
 
         await _groupRepository.AddAsync(group, cancellationToken);
 

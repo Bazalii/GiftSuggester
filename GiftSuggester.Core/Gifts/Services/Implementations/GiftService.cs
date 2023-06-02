@@ -1,4 +1,5 @@
-﻿using GiftSuggester.Core.CommonClasses;
+﻿using FluentValidation;
+using GiftSuggester.Core.CommonClasses;
 using GiftSuggester.Core.Gifts.Models;
 using GiftSuggester.Core.Gifts.Repositories;
 
@@ -8,11 +9,16 @@ public class GiftService : IGiftService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGiftRepository _giftRepository;
+    private readonly IValidator<Gift> _giftValidator;
 
-    public GiftService(IUnitOfWork unitOfWork, IGiftRepository giftRepository)
+    public GiftService(
+        IUnitOfWork unitOfWork,
+        IGiftRepository giftRepository,
+        IValidator<Gift> giftValidator)
     {
         _unitOfWork = unitOfWork;
         _giftRepository = giftRepository;
+        _giftValidator = giftValidator;
     }
 
     public async Task AddAsync(GiftCreationModel creationModel, CancellationToken cancellationToken)
@@ -25,7 +31,9 @@ public class GiftService : IGiftService
             PresenterId = creationModel.PresenterId,
             RecipientId = creationModel.RecipientId
         };
-        
+
+        await _giftValidator.ValidateAndThrowAsync(gift, cancellationToken);
+
         await _giftRepository.AddAsync(gift, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -43,15 +51,17 @@ public class GiftService : IGiftService
 
     public async Task UpdateAsync(Gift gift, CancellationToken cancellationToken)
     {
-        await _giftRepository.UpdateAsync(gift, cancellationToken);
+        await _giftValidator.ValidateAndThrowAsync(gift, cancellationToken);
         
+        await _giftRepository.UpdateAsync(gift, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         await _giftRepository.RemoveByIdAsync(id, cancellationToken);
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
