@@ -1,4 +1,5 @@
-﻿using GiftSuggester.Data.Groups.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using GiftSuggester.Data.Groups.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,6 +19,13 @@ public class UserDbModel
     {
         public void Configure(EntityTypeBuilder<UserDbModel> builder)
         {
+            builder
+                .HasIndex(dbModel => dbModel.Login)
+                .IsUnique();
+            builder
+                .HasIndex(dbModel => dbModel.Email)
+                .IsUnique();
+
             builder
                 .HasMany(dbModel => dbModel.Groups)
                 .WithMany(dbModel => dbModel.Members)
