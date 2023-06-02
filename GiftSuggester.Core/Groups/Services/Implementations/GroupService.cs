@@ -1,4 +1,5 @@
-﻿using GiftSuggester.Core.CommonClasses;
+﻿using FluentValidation;
+using GiftSuggester.Core.CommonClasses;
 using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Repositories;
 using GiftSuggester.Core.Users.Repositories;
@@ -10,15 +11,18 @@ public class GroupService : IGroupService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGroupRepository _groupRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IValidator<Group> _groupValidator;
 
     public GroupService(
         IUnitOfWork unitOfWork,
         IGroupRepository groupRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IValidator<Group> groupValidator)
     {
         _unitOfWork = unitOfWork;
         _groupRepository = groupRepository;
         _userRepository = userRepository;
+        _groupValidator = groupValidator;
     }
 
     public async Task AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken)
@@ -29,7 +33,9 @@ public class GroupService : IGroupService
             Name = creationModel.Name,
             OwnerId = creationModel.OwnerId
         };
-        
+
+        await _groupValidator.ValidateAndThrowAsync(group, cancellationToken);
+
         var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
         group.Members.Add(owner);
 

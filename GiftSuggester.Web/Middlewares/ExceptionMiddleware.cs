@@ -1,4 +1,5 @@
-﻿using GiftSuggester.Core.Exceptions;
+﻿using FluentValidation;
+using GiftSuggester.Core.Exceptions;
 
 namespace GiftSuggester.Web.Middlewares;
 
@@ -21,6 +22,13 @@ public class ExceptionMiddleware
         {
             httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             await httpContext.Response.WriteAsJsonAsync(new { Error = $"{entityNotFoundException.Message}" });
+        }
+        catch (ValidationException validationException)
+        {
+            var errorMessage = string.Join(Environment.NewLine, validationException.Errors);
+
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await httpContext.Response.WriteAsJsonAsync(new { Error = $"{errorMessage}" });
         }
         catch (Exception exception)
         {

@@ -1,18 +1,24 @@
-﻿using GiftSuggester.Core.CommonClasses;
+﻿using FluentValidation;
+using GiftSuggester.Core.CommonClasses;
 using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Repositories;
 
 namespace GiftSuggester.Core.Users.Services.Implementations;
 
-public class UserService: IUserService
+public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
+    private readonly IValidator<User> _userValidator;
 
-    public UserService(IUnitOfWork unitOfWork, IUserRepository userRepository)
+    public UserService(
+        IUnitOfWork unitOfWork,
+        IUserRepository userRepository,
+        IValidator<User> userValidator)
     {
         _unitOfWork = unitOfWork;
         _userRepository = userRepository;
+        _userValidator = userValidator;
     }
 
     public async Task AddAsync(UserCreationModel creationModel, CancellationToken cancellationToken)
@@ -27,7 +33,9 @@ public class UserService: IUserService
             DateOfBirth = creationModel.DateOfBirth,
             GroupIds = new List<Guid>()
         };
-        
+
+        await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
+
         await _userRepository.AddAsync(user, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -40,6 +48,8 @@ public class UserService: IUserService
 
     public async Task UpdateAsync(User user, CancellationToken cancellationToken)
     {
+        await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
+
         await _userRepository.AddAsync(user, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
