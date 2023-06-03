@@ -42,11 +42,12 @@ public class GiftRepository : IGiftRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsWithNameForRecipientAsync(string name, Guid recipientId,
-                                                            CancellationToken cancellationToken)
+    public async Task<bool> ExistsWithNameForRecipientInGroupAsync(string name, Guid groupId, Guid recipientId,
+                                                                   CancellationToken cancellationToken)
     {
         var dbModel = await _context.Gifts.FirstOrDefaultAsync(
-            model => model.Name == name && model.RecipientId == recipientId, cancellationToken);
+            model => model.Name == name && model.GroupId == groupId && model.RecipientId == recipientId,
+            cancellationToken);
 
         return dbModel is not null;
     }

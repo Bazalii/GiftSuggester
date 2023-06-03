@@ -33,11 +33,12 @@ public class GiftValidator : AbstractValidator<Gift>
             .MustAsync((validationObject, cancellationToken) =>
                            Task.FromResult(validationObject.PresenterId != validationObject.RecipientId))
             .WithMessage("Presenter and recipient cannot be the same person!");
-        RuleFor(x => new { x.Name, x.RecipientId })
+        RuleFor(x => new { x.Name, x.GroupId, x.RecipientId })
             .MustAsync(
                 async (validationObject, cancellationToken) =>
-                    !await giftRepository.ExistsWithNameForRecipientAsync(
+                    !await giftRepository.ExistsWithNameForRecipientInGroupAsync(
                         validationObject.Name,
+                        validationObject.GroupId,
                         validationObject.RecipientId,
                         cancellationToken))
             .WithMessage(x => $"Gift with {x.Name} name is already in list for person with {x.RecipientId} id!");
