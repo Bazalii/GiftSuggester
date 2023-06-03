@@ -1,7 +1,7 @@
 ﻿using GiftSuggester.Core.Exceptions;
 using GiftSuggester.Core.Gifts.Models;
 using GiftSuggester.Core.Gifts.Repositories;
-using GiftSuggester.Data.Gifts.Models;
+using GiftSuggester.Data.Gifts.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiftSuggester.Data.Gifts.Repositories;
@@ -9,24 +9,18 @@ namespace GiftSuggester.Data.Gifts.Repositories;
 public class GiftRepository : IGiftRepository
 {
     private readonly GiftSuggesterContext _context;
+    private readonly GiftDbModelsMapper _mapper;
 
-    public GiftRepository(GiftSuggesterContext context)
+    public GiftRepository(GiftSuggesterContext context, GiftDbModelsMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public Task AddAsync(Gift gift, CancellationToken cancellationToken)
     {
         return _context.Gifts
-            .AddAsync(
-                new GiftDbModel
-                {
-                    Id = gift.Id,
-                    Name = gift.Name,
-                    GroupId = gift.GroupId,
-                    PresenterId = gift.PresenterId,
-                    RecipientId = gift.RecipientId
-                }, cancellationToken)
+            .AddAsync(_mapper.MapGiftToDbModel(gift), cancellationToken)
             .AsTask();
     }
 
@@ -34,15 +28,7 @@ public class GiftRepository : IGiftRepository
     {
         return _context.Gifts
             .Where(gift => gift.PresenterId == id)
-            .Select(
-                dbModel => new Gift
-                {
-                    Id = dbModel.Id,
-                    Name = dbModel.Name,
-                    GroupId = dbModel.GroupId,
-                    PresenterId = dbModel.PresenterId,
-                    RecipientId = dbModel.RecipientId
-                })
+            .Select(dbModel => _mapper.MapDbModelToGift(dbModel))
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
@@ -51,24 +37,17 @@ public class GiftRepository : IGiftRepository
     {
         return _context.Gifts
             .Where(gift => gift.RecipientId == id)
-            .Select(
-                dbModel => new Gift
-                {
-                    Id = dbModel.Id,
-                    Name = dbModel.Name,
-                    GroupId = dbModel.GroupId,
-                    PresenterId = dbModel.PresenterId,
-                    RecipientId = dbModel.RecipientId
-                })
+            .Select(dbModel => _mapper.MapDbModelToGift(dbModel))
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsWithNameForRecipientAsync(string name, Guid recipientId,
-                                                            CancellationToken cancellationToken)
+    public async Task<bool> ExistsWithNameForRecipientInGroupAsync(string name, Guid groupId, Guid recipientId,
+                                                                   CancellationToken cancellationToken)
     {
         var dbModel = await _context.Gifts.FirstOrDefaultAsync(
-            model => model.Name == name && model.RecipientId == recipientId, cancellationToken);
+            model => model.Name == name && model.GroupId == groupId && model.RecipientId == recipientId,
+            cancellationToken);
 
         return dbModel is not null;
     }

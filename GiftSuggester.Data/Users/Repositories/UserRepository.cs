@@ -1,7 +1,7 @@
 ﻿using GiftSuggester.Core.Exceptions;
 using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Repositories;
-using GiftSuggester.Data.Users.Models;
+using GiftSuggester.Data.Users.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiftSuggester.Data.Users.Repositories;
@@ -9,29 +9,18 @@ namespace GiftSuggester.Data.Users.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly GiftSuggesterContext _context;
+    private readonly UserDbModelsMapper _mapper;
 
-    public UserRepository(GiftSuggesterContext context)
+    public UserRepository(GiftSuggesterContext context, UserDbModelsMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public Task AddAsync(User user, CancellationToken cancellationToken)
     {
         return _context.Users
-            .AddAsync(
-                new UserDbModel
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Login = user.Login,
-                    Email = user.Email,
-                    Password = user.Password,
-                    DateOfBirth = user.DateOfBirth,
-                    Groups = user.GroupIds
-                        .Select(id => _context.Groups.First(group => group.Id == id))
-                        .ToList()
-                }
-                , cancellationToken)
+            .AddAsync(_mapper.MapUserToDbModel(user), cancellationToken)
             .AsTask();
     }
 
@@ -41,18 +30,7 @@ public class UserRepository : IUserRepository
             await _context.Users.FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
             throw new EntityNotFoundException($"User with id: {id} is not found!");
 
-        return new User
-        {
-            Id = dbModel.Id,
-            Name = dbModel.Name,
-            Login = dbModel.Login,
-            Email = dbModel.Email,
-            Password = dbModel.Password,
-            DateOfBirth = dbModel.DateOfBirth,
-            GroupIds = dbModel.Groups
-                .Select(model => model.Id)
-                .ToList()
-        };
+        return _mapper.MapDbModelToUser(dbModel);
     }
 
     public async Task<User> GetByLoginAsync(string login, CancellationToken cancellationToken)
@@ -61,18 +39,7 @@ public class UserRepository : IUserRepository
             await _context.Users.FirstOrDefaultAsync(model => model.Login == login, cancellationToken) ??
             throw new EntityNotFoundException($"User with login: {login} is not found!");
 
-        return new User
-        {
-            Id = dbModel.Id,
-            Name = dbModel.Name,
-            Login = dbModel.Login,
-            Email = dbModel.Email,
-            Password = dbModel.Password,
-            DateOfBirth = dbModel.DateOfBirth,
-            GroupIds = dbModel.Groups
-                .Select(model => model.Id)
-                .ToList()
-        };
+        return _mapper.MapDbModelToUser(dbModel);
     }
 
     public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken)
@@ -81,18 +48,7 @@ public class UserRepository : IUserRepository
             await _context.Users.FirstOrDefaultAsync(model => model.Email == email, cancellationToken) ??
             throw new EntityNotFoundException($"User with email: {email} is not found!");
 
-        return new User
-        {
-            Id = dbModel.Id,
-            Name = dbModel.Name,
-            Login = dbModel.Login,
-            Email = dbModel.Email,
-            Password = dbModel.Password,
-            DateOfBirth = dbModel.DateOfBirth,
-            GroupIds = dbModel.Groups
-                .Select(model => model.Id)
-                .ToList()
-        };
+        return _mapper.MapDbModelToUser(dbModel);
     }
 
     public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken cancellationToken)
@@ -127,9 +83,6 @@ public class UserRepository : IUserRepository
         dbModel.Email = user.Email;
         dbModel.Password = user.Password;
         dbModel.DateOfBirth = user.DateOfBirth;
-        dbModel.Groups = user.GroupIds
-            .Select(id => _context.Groups.First(group => group.Id == id))
-            .ToList();
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)

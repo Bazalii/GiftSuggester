@@ -1,6 +1,7 @@
 ﻿using System.Net.Mime;
 using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Services;
+using GiftSuggester.Web.Users.Mappers;
 using GiftSuggester.Web.Users.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,25 +13,20 @@ namespace GiftSuggester.Web.Users.Controllers;
 public class UserController
 {
     private readonly IUserService _userService;
+    private readonly UserWebModelsMapper _mapper;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, UserWebModelsMapper mapper)
     {
         _userService = userService;
+        _mapper = mapper;
     }
 
     [HttpPost]
     public Task AddAsync(UserCreationRequest creationRequest, CancellationToken cancellationToken)
     {
-        var creationModel = new UserCreationModel
-        {
-            Name = creationRequest.Name,
-            Login = creationRequest.Login,
-            Email = creationRequest.Email,
-            Password = creationRequest.Password,
-            DateOfBirth = creationRequest.DateOfBirth
-        };
-
-        return _userService.AddAsync(creationModel, cancellationToken);
+        return _userService.AddAsync(
+            _mapper.MapCreationRequestToCreationModel(creationRequest),
+            cancellationToken);
     }
 
     [HttpGet("{id:guid}")]
@@ -38,30 +34,13 @@ public class UserController
     {
         var user = await _userService.GetByIdAsync(id, cancellationToken);
 
-        return new UserResponse
-        {
-            Id = user.Id,
-            Name = user.Name,
-            Login = user.Login,
-            Email = user.Email,
-            DateOfBirth = user.DateOfBirth,
-            GroupIds = user.GroupIds
-        };
+        return _mapper.MapUserToResponse(user);
     }
 
     [HttpPut]
     public Task UpdateAsync(UserUpdateRequest updateRequest, CancellationToken cancellationToken)
     {
-        return _userService.UpdateAsync(
-            new User
-            {
-                Id = updateRequest.Id,
-                Name = updateRequest.Name,
-                Login = updateRequest.Login,
-                Email = updateRequest.Email,
-                Password = updateRequest.Password,
-                DateOfBirth = updateRequest.DateOfBirth
-            }, cancellationToken);
+        return _userService.UpdateAsync(_mapper.MapUpdateRequestToUser(updateRequest), cancellationToken);
     }
 
     [HttpDelete("{id:guid}")]
