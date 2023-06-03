@@ -50,7 +50,7 @@ public class UserService : IUserService
     {
         await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
 
-        await _userRepository.AddAsync(user, cancellationToken);
+        await _userRepository.UpdateAsync(user, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
