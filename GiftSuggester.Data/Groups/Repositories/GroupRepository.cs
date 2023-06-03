@@ -2,6 +2,7 @@
 using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Repositories;
 using GiftSuggester.Core.Users.Models;
+using GiftSuggester.Data.Groups.Mappers;
 using GiftSuggester.Data.Groups.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,25 +11,18 @@ namespace GiftSuggester.Data.Groups.Repositories;
 public class GroupRepository : IGroupRepository
 {
     private readonly GiftSuggesterContext _context;
+    private readonly GroupDbModelsMapper _mapper;
 
-    public GroupRepository(GiftSuggesterContext context)
+    public GroupRepository(GiftSuggesterContext context, GroupDbModelsMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public Task AddAsync(Group group, CancellationToken cancellationToken)
     {
         return _context.Groups
-            .AddAsync(
-                new GroupDbModel
-                {
-                    Id = group.Id,
-                    Name = group.Name,
-                    OwnerId = group.OwnerId,
-                    Members = group.Members
-                        .Select(member => _context.Users.First(user => user.Id == member.Id))
-                        .ToList()
-                }, cancellationToken)
+            .AddAsync(_mapper.MapGroupToDbModel(group), cancellationToken)
             .AsTask();
     }
 
@@ -50,26 +44,7 @@ public class GroupRepository : IGroupRepository
         var dbModel = await _context.Groups.FirstOrDefaultAsync(dbModel => dbModel.Id == id, cancellationToken) ??
                       throw new EntityNotFoundException($"Group with id: {id} is not found!");
 
-        return new Group
-        {
-            Id = dbModel.Id,
-            OwnerId = dbModel.OwnerId,
-            Members = dbModel.Members
-                .Select(
-                    member => new User
-                    {
-                        Id = member.Id,
-                        Name = member.Name,
-                        Login = member.Login,
-                        Email = member.Email,
-                        Password = member.Password,
-                        DateOfBirth = member.DateOfBirth,
-                        GroupIds = member.Groups
-                            .Select(groupDbModel => groupDbModel.Id)
-                            .ToList()
-                    })
-                .ToList()
-        };
+        return _mapper.MapDbModelToGroup(dbModel);
     }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)

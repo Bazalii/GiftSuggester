@@ -1,6 +1,7 @@
 ﻿using System.Net.Mime;
 using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Services;
+using GiftSuggester.Web.Groups.Mappers;
 using GiftSuggester.Web.Groups.Models;
 using GiftSuggester.Web.Users.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +14,20 @@ namespace GiftSuggester.Web.Groups.Controllers;
 public class GroupController
 {
     private readonly IGroupService _groupService;
+    private readonly GroupWebModelsMapper _mapper;
 
-    public GroupController(IGroupService groupService)
+    public GroupController(IGroupService groupService, GroupWebModelsMapper mapper)
     {
         _groupService = groupService;
+        _mapper = mapper;
     }
 
     [HttpPost]
     public Task AddAsync(GroupCreationRequest creationRequest, CancellationToken cancellationToken)
     {
         return _groupService.AddAsync(
-            new GroupCreationModel
-            {
-                Name = creationRequest.Name,
-                OwnerId = creationRequest.OwnerId
-            }, cancellationToken);
+            _mapper.MapCreationRequestToCreationModel(creationRequest),
+            cancellationToken);
     }
 
     [HttpPut("{groupId:guid}/{userId:guid}")]
@@ -41,23 +41,7 @@ public class GroupController
     {
         var group = await _groupService.GetByIdAsync(id, cancellationToken);
 
-        return new GroupResponse
-        {
-            Id = group.Id,
-            OwnerId = group.OwnerId,
-            Members = group.Members
-                .Select(
-                    user => new UserResponse
-                    {
-                        Id = user.Id,
-                        Name = user.Name,
-                        Login = user.Login,
-                        Email = user.Email,
-                        DateOfBirth = user.DateOfBirth,
-                        GroupIds = user.GroupIds
-                    })
-                .ToList()
-        };
+        return _mapper.MapGroupToResponse(group);
     }
 
     [HttpDelete("{id:guid}")]

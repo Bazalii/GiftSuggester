@@ -2,8 +2,11 @@
 using GiftSuggester.Core.Gifts.Repositories;
 using GiftSuggester.Core.Groups.Repositories;
 using GiftSuggester.Core.Users.Repositories;
+using GiftSuggester.Data.Gifts.Mappers;
 using GiftSuggester.Data.Gifts.Repositories;
+using GiftSuggester.Data.Groups.Mappers;
 using GiftSuggester.Data.Groups.Repositories;
+using GiftSuggester.Data.Users.Mappers;
 using GiftSuggester.Data.Users.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,11 +22,16 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IGroupRepository, GroupRepository>();
         serviceCollection.AddScoped<IUserRepository, UserRepository>();
 
+        serviceCollection.AddScoped<GiftDbModelsMapper, GiftDbModelsMapper>();
+        serviceCollection.AddScoped<GroupDbModelsMapper, GroupDbModelsMapper>();
+        serviceCollection.AddScoped<UserDbModelsMapper, UserDbModelsMapper>();
+
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        serviceCollection.AddDbContext<GiftSuggesterContext>(options => options
-            .UseLazyLoadingProxies()
-            .UseNpgsql(configuration["DbConnectionString"]));
+        serviceCollection.AddDbContext<GiftSuggesterContext>(
+            options => options
+                .UseLazyLoadingProxies()
+                .UseNpgsql(configuration["DbConnectionString"]));
 
         return serviceCollection;
     }
