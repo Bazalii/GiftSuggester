@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Services;
 using GiftSuggester.Web.Users.Mappers;
 using GiftSuggester.Web.Users.Models;
@@ -37,10 +36,36 @@ public class UserController
         return _mapper.MapUserToResponse(user);
     }
 
+    [HttpGet("byLogin/{login}")]
+    public async Task<UserResponse> GetByLoginAsync(string login, CancellationToken cancellationToken)
+    {
+        var user = await _userService.GetByLoginAsync(login, cancellationToken);
+
+        return _mapper.MapUserToResponse(user);
+    }
+
+    [HttpGet("byEmail/{email}")]
+    public async Task<UserResponse> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await _userService.GetByEmailAsync(email, cancellationToken);
+
+        return _mapper.MapUserToResponse(user);
+    }
+
     [HttpPut]
     public Task UpdateAsync(UserUpdateRequest updateRequest, CancellationToken cancellationToken)
     {
         return _userService.UpdateAsync(_mapper.MapUpdateRequestToUser(updateRequest), cancellationToken);
+    }
+
+    [HttpPut("password")]
+    public Task UpdatePasswordAsync(UpdateUserPasswordRequest updateRequest, CancellationToken cancellationToken)
+    {
+        return _userService.UpdatePasswordAsync(
+            updateRequest.UserId,
+            updateRequest.OldPassword,
+            updateRequest.NewPassword,
+            cancellationToken);
     }
 
     [HttpDelete("{id:guid}")]

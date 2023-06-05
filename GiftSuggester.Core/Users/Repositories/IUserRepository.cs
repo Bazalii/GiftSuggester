@@ -12,5 +12,6 @@ public interface IUserRepository
     Task<bool> ExistsWithLoginAsync(string login, CancellationToken cancellationToken);
     Task<bool> ExistsWithEmailAsync(string email, CancellationToken cancellationToken);
     Task UpdateAsync(User user, CancellationToken cancellationToken);
+    Task UpdatePasswordAsync(Guid id, string password, CancellationToken cancellationToken);
     Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken);
 }

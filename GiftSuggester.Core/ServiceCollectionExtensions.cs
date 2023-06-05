@@ -25,7 +25,8 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IValidator<Gift>, GiftValidator>();
         serviceCollection.AddScoped<IValidator<Group>, GroupValidator>();
-        serviceCollection.AddScoped<IValidator<User>, UserValidator>();
+        serviceCollection.AddScoped<UserValidator>();
+        serviceCollection.AddScoped<UserPasswordValidator>();
 
         return serviceCollection;
     }

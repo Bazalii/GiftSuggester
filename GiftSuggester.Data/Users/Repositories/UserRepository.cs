@@ -81,8 +81,16 @@ public class UserRepository : IUserRepository
         dbModel.Name = user.Name;
         dbModel.Login = user.Login;
         dbModel.Email = user.Email;
-        dbModel.Password = user.Password;
         dbModel.DateOfBirth = user.DateOfBirth;
+    }
+
+    public async Task UpdatePasswordAsync(Guid id, string password, CancellationToken cancellationToken)
+    {
+        var dbModel =
+            await _context.Users.FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
+            throw new EntityNotFoundException($"User with id: {id} is not found!");
+
+        dbModel.Password = password;
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)
