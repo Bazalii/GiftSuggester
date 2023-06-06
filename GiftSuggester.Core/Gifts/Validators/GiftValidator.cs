@@ -20,6 +20,10 @@ public class GiftValidator : AbstractValidator<Gift>
             .MustAsync(async (groupId, cancellationToken) =>
                            await groupRepository.ExistsAsync(groupId, cancellationToken))
             .WithMessage("Group with this id: {PropertyValue} doesn't exist!");
+        RuleFor(x => x.CreatorId)
+            .MustAsync(async (creatorId, cancellationToken) =>
+                           await userRepository.ExistsWithIdAsync(creatorId, cancellationToken))
+            .WithMessage("Creator with this id: {PropertyValue} doesn't exist!");
         RuleFor(x => x.PresenterId)
             .MustAsync(async (presenterId, cancellationToken) =>
                            presenterId == Guid.Empty ||

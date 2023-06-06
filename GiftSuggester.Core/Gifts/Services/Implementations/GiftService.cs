@@ -28,6 +28,7 @@ public class GiftService : IGiftService
             Id = Guid.NewGuid(),
             Name = creationModel.Name,
             GroupId = creationModel.GroupId,
+            CreatorId = creationModel.CreatorId,
             PresenterId = creationModel.PresenterId,
             RecipientId = creationModel.RecipientId
         };
