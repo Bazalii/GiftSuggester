@@ -39,6 +39,16 @@ public class GiftService : IGiftService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public Task<Gift> GetByPresenterRecipientAndGroupAsync(Guid presenterId, Guid recipientId, Guid groupId,
+                                                           CancellationToken cancellationToken)
+    {
+        return _giftRepository.GetByPresenterRecipientAndGroupAsync(
+            groupId,
+            presenterId,
+            recipientId,
+            cancellationToken);
+    }
+
     public Task<List<Gift>> GetAllByPresenterIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return _giftRepository.GetAllByPresenterIdAsync(id, cancellationToken);
@@ -52,7 +62,7 @@ public class GiftService : IGiftService
     public async Task UpdateAsync(Gift gift, CancellationToken cancellationToken)
     {
         await _giftValidator.ValidateAndThrowAsync(gift, cancellationToken);
-        
+
         await _giftRepository.UpdateAsync(gift, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -28,6 +28,19 @@ public class GiftController
             cancellationToken);
     }
 
+    [HttpGet("{groupId:guid}/{presenterId:guid}/{recipientId:guid}")]
+    public async Task<GiftResponse> GetByPresenterRecipientAndGroupAsync(
+        Guid groupId, Guid presenterId, Guid recipientId, CancellationToken cancellationToken)
+    {
+        var gift = await _giftService.GetByPresenterRecipientAndGroupAsync(
+            groupId,
+            presenterId,
+            recipientId,
+            cancellationToken);
+
+        return _mapper.MapGiftToResponse(gift);
+    }
+
     [HttpGet("getAllByPresenterId/{id:guid}")]
     public async Task<List<GiftResponse>> GetAllByPresenterIdAsync(Guid id, CancellationToken cancellationToken)
     {

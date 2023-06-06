@@ -24,6 +24,20 @@ public class GiftRepository : IGiftRepository
             .AsTask();
     }
 
+    public async Task<Gift> GetByPresenterRecipientAndGroupAsync(Guid groupId, Guid presenterId, Guid recipientId,
+                                                                 CancellationToken cancellationToken)
+    {
+        var dbModel = await _context.Gifts
+                          .FirstOrDefaultAsync(
+                              dbModel => dbModel.GroupId == groupId &&
+                                         dbModel.PresenterId == presenterId &&
+                                         dbModel.RecipientId == recipientId,
+                              cancellationToken: cancellationToken) ??
+                      throw new EntityNotFoundException("Gift is not found!");
+
+        return _mapper.MapDbModelToGift(dbModel);
+    }
+
     public Task<List<Gift>> GetAllByPresenterIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return _context.Gifts
