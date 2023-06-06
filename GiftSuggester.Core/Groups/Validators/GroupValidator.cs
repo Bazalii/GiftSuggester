@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using FluentValidation;
+﻿using FluentValidation;
 using GiftSuggester.Core.Users.Repositories;
 using Group = GiftSuggester.Core.Groups.Models.Group;
 
@@ -14,9 +13,5 @@ public class GroupValidator : AbstractValidator<Group>
             .WithMessage("{PropertyName} length has to be from {MinLength} characters to {MaxLength} characters!")
             .Matches("^[а-яА-Яa-zA-Z0-9\\s]*$")
             .WithMessage("{PropertyName} has to consist only of English or Russian letters, numbers and spaces!");
-        RuleFor(x => x.OwnerId)
-            .MustAsync(async (ownerId, cancellationToken) =>
-                           await userRepository.ExistsWithIdAsync(ownerId, cancellationToken))
-            .WithMessage("Owner with this id: {PropertyValue} doesn't exist!");
     }
 }
