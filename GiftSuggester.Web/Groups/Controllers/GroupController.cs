@@ -28,6 +28,14 @@ public class GroupController
             cancellationToken);
     }
 
+    [HttpGet("{id:guid}")]
+    public async Task<GroupResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var group = await _groupService.GetByIdAsync(id, cancellationToken);
+
+        return _mapper.MapGroupToResponse(group);
+    }
+
     [HttpPut("addUserToGroup/{groupId:guid}/{userId:guid}")]
     public Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
@@ -40,12 +48,16 @@ public class GroupController
         return _groupService.RemoveUserFromGroupAsync(groupId, userId, cancellationToken);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<GroupResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    [HttpPut("promoteToAdmin/{groupId:guid}/{userId:guid}")]
+    public Task PromoteToAdminAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
-        var group = await _groupService.GetByIdAsync(id, cancellationToken);
+        return _groupService.PromoteToAdminAsync(groupId, userId, cancellationToken);
+    }
 
-        return _mapper.MapGroupToResponse(group);
+    [HttpPut("removeAdminRights/{groupId:guid}/{userId:guid}")]
+    public Task RemoveAdminRightsAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        return _groupService.RemoveAdminRightsAsync(groupId, userId, cancellationToken);
     }
 
     [HttpDelete("{id:guid}")]

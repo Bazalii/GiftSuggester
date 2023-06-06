@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using GiftSuggester.Core.CommonClasses;
+using GiftSuggester.Core.Exceptions;
 using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Repositories;
 using GiftSuggester.Core.Users.Repositories;
@@ -27,25 +28,34 @@ public class GroupService : IGroupService
 
     public async Task AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken)
     {
+        var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
+
         var group = new Group
         {
             Id = Guid.NewGuid(),
             Name = creationModel.Name,
-            OwnerId = creationModel.OwnerId
+            Owner = owner
         };
 
         await _groupValidator.ValidateAndThrowAsync(group, cancellationToken);
-
-        var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
-        group.Members.Add(owner);
 
         await _groupRepository.AddAsync(group, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return _groupRepository.GetByIdAsync(id, cancellationToken);
+    }
+
     public async Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
+        if (await _groupRepository.ContainsUserAsync(groupId, userId, cancellationToken))
+        {
+            throw new AlreadyContainsException($"User with id: {userId} is already in group with id: {groupId}");
+        }
+
         await _groupRepository.AddUserToGroupAsync(groupId, userId, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -58,9 +68,24 @@ public class GroupService : IGroupService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task PromoteToAdminAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
-        return _groupRepository.GetByIdAsync(id, cancellationToken);
+        if (await _groupRepository.ContainsUserAsAdminAsync(groupId, userId, cancellationToken))
+        {
+            throw new AlreadyContainsException(
+                $"User with id: {userId} is already admin of the group with id: {groupId}");
+        }
+
+        await _groupRepository.PromoteToAdminAsync(groupId, userId, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RemoveAdminRightsAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        await _groupRepository.RemoveAdminRightsAsync(groupId, userId, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)
