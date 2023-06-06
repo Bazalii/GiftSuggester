@@ -39,6 +39,19 @@ public class GroupRepository : IGroupRepository
         groupDbModel.Members.Add(userDbModel);
     }
 
+    public async Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        var groupDbModel =
+            await _context.Groups.FirstOrDefaultAsync(dbModel => dbModel.Id == groupId, cancellationToken) ??
+            throw new EntityNotFoundException($"Group with id: {groupId} is not found!");
+
+        var userDbModel =
+            groupDbModel.Members.FirstOrDefault(dbModel => dbModel.Id == userId) ??
+            throw new EntityNotFoundException($"User with id: {userId} is not in the group with id: {groupId}!");
+
+        groupDbModel.Members.Remove(userDbModel);
+    }
+
     public async Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var dbModel = await _context.Groups.FirstOrDefaultAsync(dbModel => dbModel.Id == id, cancellationToken) ??

@@ -6,6 +6,7 @@ public interface IGroupRepository
 {
     Task AddAsync(Group group, CancellationToken cancellationToken);
     Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken);
+    Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken);
     Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken);
     Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken);

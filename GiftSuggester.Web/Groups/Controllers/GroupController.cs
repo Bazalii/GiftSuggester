@@ -1,9 +1,7 @@
 ﻿using System.Net.Mime;
-using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Services;
 using GiftSuggester.Web.Groups.Mappers;
 using GiftSuggester.Web.Groups.Models;
-using GiftSuggester.Web.Users.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GiftSuggester.Web.Groups.Controllers;
@@ -30,10 +28,16 @@ public class GroupController
             cancellationToken);
     }
 
-    [HttpPut("{groupId:guid}/{userId:guid}")]
+    [HttpPut("addUserToGroup/{groupId:guid}/{userId:guid}")]
     public Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
         return _groupService.AddUserToGroupAsync(groupId, userId, cancellationToken);
+    }
+
+    [HttpPut("removeUserFromGroup/{groupId:guid}/{userId:guid}")]
+    public Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        return _groupService.RemoveUserFromGroupAsync(groupId, userId, cancellationToken);
     }
 
     [HttpGet("{id:guid}")]

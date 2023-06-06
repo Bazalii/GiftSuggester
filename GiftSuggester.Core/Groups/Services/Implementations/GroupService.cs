@@ -51,6 +51,13 @@ public class GroupService : IGroupService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        await _groupRepository.RemoveUserFromGroupAsync(groupId, userId, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     public Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return _groupRepository.GetByIdAsync(id, cancellationToken);
