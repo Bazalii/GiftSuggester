@@ -22,9 +22,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IGroupRepository, GroupRepository>();
         serviceCollection.AddScoped<IUserRepository, UserRepository>();
 
-        serviceCollection.AddScoped<GiftDbModelsMapper, GiftDbModelsMapper>();
-        serviceCollection.AddScoped<GroupDbModelsMapper, GroupDbModelsMapper>();
-        serviceCollection.AddScoped<UserDbModelsMapper, UserDbModelsMapper>();
+        serviceCollection.AddScoped<GiftDbModelsMapper>();
+        serviceCollection.AddScoped<GroupDbModelsMapper>();
+        serviceCollection.AddScoped<UserDbModelsMapper>();
 
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
 

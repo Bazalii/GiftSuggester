@@ -9,11 +9,11 @@ namespace GiftSuggester.Core.Users.Services.Implementations;
 
 public class UserService : IUserService
 {
+    private readonly UserCoreModelsMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly UserPasswordValidator _userPasswordValidator;
     private readonly IUserRepository _userRepository;
     private readonly UserValidator _userValidator;
-    private readonly UserPasswordValidator _userPasswordValidator;
-    private readonly UserCoreModelsMapper _mapper;
 
     public UserService(
         IUnitOfWork unitOfWork,
@@ -69,10 +69,7 @@ public class UserService : IUserService
     {
         var user = await _userRepository.GetByIdAsync(id, cancellationToken);
 
-        if (user.Password != oldPassword)
-        {
-            throw new InvalidCredentialsException("Invalid old password!");
-        }
+        if (user.Password != oldPassword) throw new InvalidCredentialsException("Invalid old password!");
 
         user.Password = newPassword;
 

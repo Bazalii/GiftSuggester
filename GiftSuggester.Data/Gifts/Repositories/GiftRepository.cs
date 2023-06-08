@@ -32,7 +32,7 @@ public class GiftRepository : IGiftRepository
                               dbModel => dbModel.GroupId == groupId &&
                                          dbModel.PresenterId == presenterId &&
                                          dbModel.RecipientId == recipientId,
-                              cancellationToken: cancellationToken) ??
+                              cancellationToken) ??
                       throw new EntityNotFoundException("Gift is not found!");
 
         return _mapper.MapDbModelToGift(dbModel);

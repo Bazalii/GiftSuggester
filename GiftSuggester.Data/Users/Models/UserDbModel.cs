@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using GiftSuggester.Data.Groups.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GiftSuggester.Data.Users.Models;

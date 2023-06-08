@@ -11,8 +11,8 @@ namespace GiftSuggester.Web.Users.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class UserController
 {
-    private readonly IUserService _userService;
     private readonly UserWebModelsMapper _mapper;
+    private readonly IUserService _userService;
 
     public UserController(IUserService userService, UserWebModelsMapper mapper)
     {

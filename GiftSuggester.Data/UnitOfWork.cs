@@ -5,7 +5,7 @@ namespace GiftSuggester.Data;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly GiftSuggesterContext _context;
-    
+
     public UnitOfWork(GiftSuggesterContext context)
     {
         _context = context;

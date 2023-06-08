@@ -20,7 +20,9 @@ public partial class GroupWebModelsMapper
     public partial GroupCreationModel MapCreationRequestToCreationModel(GroupCreationRequest creationRequest);
     public partial GroupResponse MapGroupToResponse(Group group);
 
-    private List<UserResponse> MapUsersToUserResponses(List<User> users) =>
-        users.Select(user => _userWebModelsMapper.MapUserToResponse(user))
+    private List<UserResponse> MapUsersToUserResponses(List<User> users)
+    {
+        return users.Select(user => _userWebModelsMapper.MapUserToResponse(user))
             .ToList();
+    }
 }

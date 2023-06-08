@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
+using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Users.Repositories;
-using Group = GiftSuggester.Core.Groups.Models.Group;
 
 namespace GiftSuggester.Core.Groups.Validators;
 

@@ -8,13 +8,13 @@ namespace GiftSuggester.Data;
 
 public class GiftSuggesterContext : DbContext
 {
-    public DbSet<GiftDbModel> Gifts { get; set; } = null!;
-    public DbSet<GroupDbModel> Groups { get; set; } = null!;
-    public DbSet<UserDbModel> Users { get; set; } = null!;
-
     public GiftSuggesterContext(DbContextOptions options) : base(options)
     {
     }
+
+    public DbSet<GiftDbModel> Gifts { get; set; } = null!;
+    public DbSet<GroupDbModel> Groups { get; set; } = null!;
+    public DbSet<UserDbModel> Users { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

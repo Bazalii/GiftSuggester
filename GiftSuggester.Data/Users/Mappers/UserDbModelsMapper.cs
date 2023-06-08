@@ -1,5 +1,4 @@
 ﻿using GiftSuggester.Core.Users.Models;
-using GiftSuggester.Data.Groups.Models;
 using GiftSuggester.Data.Users.Models;
 using Riok.Mapperly.Abstractions;
 

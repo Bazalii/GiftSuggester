@@ -8,10 +8,10 @@ namespace GiftSuggester.Core.Gifts.Services.Implementations;
 
 public class GiftService : IGiftService
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IGiftRepository _giftRepository;
     private readonly IValidator<Gift> _giftValidator;
     private readonly GiftCoreModelsMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
     public GiftService(
         IUnitOfWork unitOfWork,

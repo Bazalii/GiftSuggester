@@ -9,10 +9,10 @@ namespace GiftSuggester.Core.Groups.Services.Implementations;
 
 public class GroupService : IGroupService
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IGroupRepository _groupRepository;
-    private readonly IUserRepository _userRepository;
     private readonly IValidator<Group> _groupValidator;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
 
     public GroupService(
         IUnitOfWork unitOfWork,
@@ -52,9 +52,7 @@ public class GroupService : IGroupService
     public async Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
         if (await _groupRepository.ContainsUserAsync(groupId, userId, cancellationToken))
-        {
             throw new AlreadyContainsException($"User with id: {userId} is already in group with id: {groupId}");
-        }
 
         await _groupRepository.AddUserToGroupAsync(groupId, userId, cancellationToken);
 
@@ -71,10 +69,8 @@ public class GroupService : IGroupService
     public async Task PromoteToAdminAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
     {
         if (await _groupRepository.ContainsUserAsAdminAsync(groupId, userId, cancellationToken))
-        {
             throw new AlreadyContainsException(
                 $"User with id: {userId} is already admin of the group with id: {groupId}");
-        }
 
         await _groupRepository.PromoteToAdminAsync(groupId, userId, cancellationToken);
 
