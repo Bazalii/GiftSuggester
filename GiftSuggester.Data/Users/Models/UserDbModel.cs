@@ -13,7 +13,6 @@ public class UserDbModel
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; }
-    public virtual List<GroupDbModel> Groups { get; set; } = new();
 
     internal class Map : IEntityTypeConfiguration<UserDbModel>
     {
@@ -25,11 +24,6 @@ public class UserDbModel
             builder
                 .HasIndex(dbModel => dbModel.Email)
                 .IsUnique();
-
-            builder
-                .HasMany(dbModel => dbModel.Groups)
-                .WithMany(dbModel => dbModel.Members)
-                .UsingEntity("groups_users");
         }
     }
 }

@@ -20,6 +20,11 @@ public class GroupDbModel
                 .HasMany(dbModel => dbModel.Admins)
                 .WithMany()
                 .UsingEntity("groups_admins");
+            
+            builder
+                .HasMany(dbModel => dbModel.Members)
+                .WithMany()
+                .UsingEntity("groups_members");
 
             builder
                 .HasOne(dbModel => dbModel.Owner)

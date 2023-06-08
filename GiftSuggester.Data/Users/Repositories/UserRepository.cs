@@ -27,7 +27,9 @@ public class UserRepository : IUserRepository
     public async Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var dbModel =
-            await _context.Users.FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
+            await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
             throw new EntityNotFoundException($"User with id: {id} is not found!");
 
         return _mapper.MapDbModelToUser(dbModel);
