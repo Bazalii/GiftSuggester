@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using GiftSuggester.Core.CommonClasses;
+using GiftSuggester.Core.Gifts.Mappers;
 using GiftSuggester.Core.Gifts.Models;
 using GiftSuggester.Core.Gifts.Repositories;
 
@@ -10,28 +11,23 @@ public class GiftService : IGiftService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGiftRepository _giftRepository;
     private readonly IValidator<Gift> _giftValidator;
+    private readonly GiftCoreModelsMapper _mapper;
 
     public GiftService(
         IUnitOfWork unitOfWork,
         IGiftRepository giftRepository,
-        IValidator<Gift> giftValidator)
+        IValidator<Gift> giftValidator,
+        GiftCoreModelsMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _giftRepository = giftRepository;
         _giftValidator = giftValidator;
+        _mapper = mapper;
     }
 
     public async Task AddAsync(GiftCreationModel creationModel, CancellationToken cancellationToken)
     {
-        var gift = new Gift
-        {
-            Id = Guid.NewGuid(),
-            Name = creationModel.Name,
-            GroupId = creationModel.GroupId,
-            CreatorId = creationModel.CreatorId,
-            PresenterId = creationModel.PresenterId,
-            RecipientId = creationModel.RecipientId
-        };
+        var gift = _mapper.MapCreationModelToGift(creationModel);
 
         await _giftValidator.ValidateAndThrowAsync(gift, cancellationToken);
 

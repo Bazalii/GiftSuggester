@@ -13,31 +13,25 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly UserValidator _userValidator;
     private readonly UserPasswordValidator _userPasswordValidator;
+    private readonly UserCoreModelsMapper _mapper;
 
     public UserService(
         IUnitOfWork unitOfWork,
         IUserRepository userRepository,
         UserValidator userValidator,
-        UserPasswordValidator userPasswordValidator)
+        UserPasswordValidator userPasswordValidator,
+        UserCoreModelsMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _userRepository = userRepository;
         _userValidator = userValidator;
         _userPasswordValidator = userPasswordValidator;
+        _mapper = mapper;
     }
 
     public async Task AddAsync(UserCreationModel creationModel, CancellationToken cancellationToken)
     {
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Name = creationModel.Name,
-            Login = creationModel.Login,
-            Email = creationModel.Email,
-            Password = creationModel.Password,
-            DateOfBirth = creationModel.DateOfBirth,
-            GroupIds = new List<Guid>()
-        };
+        var user = _mapper.MapCreationModelToUser(creationModel);
 
         await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
 
