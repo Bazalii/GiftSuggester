@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using GiftSuggester.Core.Gifts.Mappers;
 using GiftSuggester.Core.Gifts.Models;
 using GiftSuggester.Core.Gifts.Services;
 using GiftSuggester.Core.Gifts.Services.Implementations;
@@ -7,7 +8,7 @@ using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Services;
 using GiftSuggester.Core.Groups.Services.Implementations;
 using GiftSuggester.Core.Groups.Validators;
-using GiftSuggester.Core.Users.Models;
+using GiftSuggester.Core.Users;
 using GiftSuggester.Core.Users.Services;
 using GiftSuggester.Core.Users.Services.Implementations;
 using GiftSuggester.Core.Users.Validators;
@@ -25,7 +26,11 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IValidator<Gift>, GiftValidator>();
         serviceCollection.AddScoped<IValidator<Group>, GroupValidator>();
-        serviceCollection.AddScoped<IValidator<User>, UserValidator>();
+        serviceCollection.AddScoped<UserValidator>();
+        serviceCollection.AddScoped<UserPasswordValidator>();
+
+        serviceCollection.AddScoped<UserCoreModelsMapper>();
+        serviceCollection.AddScoped<GiftCoreModelsMapper>();
 
         return serviceCollection;
     }

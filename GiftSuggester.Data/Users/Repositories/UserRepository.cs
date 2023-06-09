@@ -17,17 +17,20 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
-    public Task AddAsync(User user, CancellationToken cancellationToken)
+    public async Task<User> AddAsync(User user, CancellationToken cancellationToken)
     {
-        return _context.Users
-            .AddAsync(_mapper.MapUserToDbModel(user), cancellationToken)
-            .AsTask();
+        var entryEntity = await _context.Users
+            .AddAsync(_mapper.MapUserToDbModel(user), cancellationToken);
+
+        return _mapper.MapDbModelToUser(entryEntity.Entity);
     }
 
     public async Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var dbModel =
-            await _context.Users.FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
+            await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
             throw new EntityNotFoundException($"User with id: {id} is not found!");
 
         return _mapper.MapDbModelToUser(dbModel);
@@ -81,8 +84,16 @@ public class UserRepository : IUserRepository
         dbModel.Name = user.Name;
         dbModel.Login = user.Login;
         dbModel.Email = user.Email;
-        dbModel.Password = user.Password;
         dbModel.DateOfBirth = user.DateOfBirth;
+    }
+
+    public async Task UpdatePasswordAsync(Guid id, string password, CancellationToken cancellationToken)
+    {
+        var dbModel =
+            await _context.Users.FirstOrDefaultAsync(model => model.Id == id, cancellationToken) ??
+            throw new EntityNotFoundException($"User with id: {id} is not found!");
+
+        dbModel.Password = password;
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)

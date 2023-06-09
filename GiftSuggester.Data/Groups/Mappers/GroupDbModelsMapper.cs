@@ -22,11 +22,20 @@ public partial class GroupDbModelsMapper
     public partial GroupDbModel MapGroupToDbModel(Group group);
     public partial Group MapDbModelToGroup(GroupDbModel dbModel);
 
-    private List<UserDbModel> MembersToUserDbModels(List<User> members) =>
-        members.Select(member => _context.Users.First(user => user.Id == member.Id))
-            .ToList();
+    private UserDbModel UserToUserDbModel(User user)
+    {
+        return _context.Users.First(dbModel => dbModel.Id == user.Id);
+    }
 
-    private List<User> DbModelsToMembers(List<UserDbModel> dbModels) =>
-        dbModels.Select(dbModel => _userDbModelsMapper.MapDbModelToUser(dbModel))
+    private List<UserDbModel> UsersToUserDbModels(List<User> users)
+    {
+        return users.Select(member => _context.Users.First(user => user.Id == member.Id))
             .ToList();
+    }
+
+    private List<User> DbModelsToUsers(List<UserDbModel> dbModels)
+    {
+        return dbModels.Select(dbModel => _userDbModelsMapper.MapDbModelToUser(dbModel))
+            .ToList();
+    }
 }

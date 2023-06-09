@@ -6,6 +6,7 @@ public class Group
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public Guid OwnerId { get; set; }
+    public User Owner { get; set; } = new();
+    public List<User> Admins { get; set; } = new();
     public List<User> Members { get; set; } = new();
 }

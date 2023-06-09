@@ -32,6 +32,10 @@ namespace GiftSuggester.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("creator_id");
+
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uuid")
                         .HasColumnName("group_id");
@@ -73,6 +77,9 @@ namespace GiftSuggester.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_groups");
+
+                    b.HasIndex("OwnerId")
+                        .HasDatabaseName("ix_groups_owner_id");
 
                     b.ToTable("groups", (string)null);
                 });
@@ -122,40 +129,88 @@ namespace GiftSuggester.Data.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("groups_users", b =>
+            modelBuilder.Entity("groups_admins", b =>
                 {
-                    b.Property<Guid>("GroupsId")
+                    b.Property<Guid>("AdminsId")
                         .HasColumnType("uuid")
-                        .HasColumnName("groups_id");
+                        .HasColumnName("admins_id");
+
+                    b.Property<Guid>("GroupDbModelId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_db_model_id");
+
+                    b.HasKey("AdminsId", "GroupDbModelId")
+                        .HasName("pk_groups_admins");
+
+                    b.HasIndex("GroupDbModelId")
+                        .HasDatabaseName("ix_groups_admins_group_db_model_id");
+
+                    b.ToTable("groups_admins", (string)null);
+                });
+
+            modelBuilder.Entity("groups_members", b =>
+                {
+                    b.Property<Guid>("GroupDbModel1Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_db_model1id");
 
                     b.Property<Guid>("MembersId")
                         .HasColumnType("uuid")
                         .HasColumnName("members_id");
 
-                    b.HasKey("GroupsId", "MembersId")
-                        .HasName("pk_groups_users");
+                    b.HasKey("GroupDbModel1Id", "MembersId")
+                        .HasName("pk_groups_members");
 
                     b.HasIndex("MembersId")
-                        .HasDatabaseName("ix_groups_users_members_id");
+                        .HasDatabaseName("ix_groups_members_members_id");
 
-                    b.ToTable("groups_users", (string)null);
+                    b.ToTable("groups_members", (string)null);
                 });
 
-            modelBuilder.Entity("groups_users", b =>
+            modelBuilder.Entity("GiftSuggester.Data.Groups.Models.GroupDbModel", b =>
+                {
+                    b.HasOne("GiftSuggester.Data.Users.Models.UserDbModel", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_groups_users_owner_id");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("groups_admins", b =>
+                {
+                    b.HasOne("GiftSuggester.Data.Users.Models.UserDbModel", null)
+                        .WithMany()
+                        .HasForeignKey("AdminsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_groups_admins_users_admins_id");
+
+                    b.HasOne("GiftSuggester.Data.Groups.Models.GroupDbModel", null)
+                        .WithMany()
+                        .HasForeignKey("GroupDbModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_groups_admins_groups_group_db_model_id");
+                });
+
+            modelBuilder.Entity("groups_members", b =>
                 {
                     b.HasOne("GiftSuggester.Data.Groups.Models.GroupDbModel", null)
                         .WithMany()
-                        .HasForeignKey("GroupsId")
+                        .HasForeignKey("GroupDbModel1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_groups_users_groups_groups_id");
+                        .HasConstraintName("fk_groups_members_groups_group_db_model1id");
 
                     b.HasOne("GiftSuggester.Data.Users.Models.UserDbModel", null)
                         .WithMany()
                         .HasForeignKey("MembersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_groups_users_users_members_id");
+                        .HasConstraintName("fk_groups_members_users_members_id");
                 });
 #pragma warning restore 612, 618
         }

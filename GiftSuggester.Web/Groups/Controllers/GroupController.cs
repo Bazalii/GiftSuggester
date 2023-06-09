@@ -3,7 +3,6 @@ using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Services;
 using GiftSuggester.Web.Groups.Mappers;
 using GiftSuggester.Web.Groups.Models;
-using GiftSuggester.Web.Users.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GiftSuggester.Web.Groups.Controllers;
@@ -23,17 +22,13 @@ public class GroupController
     }
 
     [HttpPost]
-    public Task AddAsync(GroupCreationRequest creationRequest, CancellationToken cancellationToken)
+    public async Task<GroupResponse> AddAsync(GroupCreationRequest creationRequest, CancellationToken cancellationToken)
     {
-        return _groupService.AddAsync(
+        var addedGroup = await _groupService.AddAsync(
             _mapper.MapCreationRequestToCreationModel(creationRequest),
             cancellationToken);
-    }
 
-    [HttpPut("{groupId:guid}/{userId:guid}")]
-    public Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
-    {
-        return _groupService.AddUserToGroupAsync(groupId, userId, cancellationToken);
+        return _mapper.MapGroupToResponse(addedGroup);
     }
 
     [HttpGet("{id:guid}")]
@@ -42,6 +37,30 @@ public class GroupController
         var group = await _groupService.GetByIdAsync(id, cancellationToken);
 
         return _mapper.MapGroupToResponse(group);
+    }
+
+    [HttpPut("addUserToGroup/{groupId:guid}/{userId:guid}")]
+    public Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        return _groupService.AddUserToGroupAsync(groupId, userId, cancellationToken);
+    }
+
+    [HttpPut("removeUserFromGroup/{groupId:guid}/{userId:guid}")]
+    public Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        return _groupService.RemoveUserFromGroupAsync(groupId, userId, cancellationToken);
+    }
+
+    [HttpPut("promoteToAdmin/{groupId:guid}/{userId:guid}")]
+    public Task PromoteToAdminAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        return _groupService.PromoteToAdminAsync(groupId, userId, cancellationToken);
+    }
+
+    [HttpPut("removeAdminRights/{groupId:guid}/{userId:guid}")]
+    public Task RemoveAdminRightsAsync(Guid groupId, Guid userId, CancellationToken cancellationToken)
+    {
+        return _groupService.RemoveAdminRightsAsync(groupId, userId, cancellationToken);
     }
 
     [HttpDelete("{id:guid}")]
