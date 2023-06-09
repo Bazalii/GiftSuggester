@@ -4,7 +4,7 @@ namespace GiftSuggester.Core.Groups.Services;
 
 public interface IGroupService
 {
-    Task AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken);
+    Task<Group> AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken);
     Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken);
     Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken);

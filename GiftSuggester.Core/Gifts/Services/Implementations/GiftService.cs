@@ -25,15 +25,17 @@ public class GiftService : IGiftService
         _mapper = mapper;
     }
 
-    public async Task AddAsync(GiftCreationModel creationModel, CancellationToken cancellationToken)
+    public async Task<Gift> AddAsync(GiftCreationModel creationModel, CancellationToken cancellationToken)
     {
         var gift = _mapper.MapCreationModelToGift(creationModel);
 
         await _giftValidator.ValidateAndThrowAsync(gift, cancellationToken);
 
-        await _giftRepository.AddAsync(gift, cancellationToken);
+        var addedGift = await _giftRepository.AddAsync(gift, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return addedGift;
     }
 
     public Task<Gift> GetByPresenterRecipientAndGroupAsync(Guid presenterId, Guid recipientId, Guid groupId,

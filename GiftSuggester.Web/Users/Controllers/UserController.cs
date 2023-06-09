@@ -21,11 +21,13 @@ public class UserController
     }
 
     [HttpPost]
-    public Task AddAsync(UserCreationRequest creationRequest, CancellationToken cancellationToken)
+    public async Task<UserResponse> AddAsync(UserCreationRequest creationRequest, CancellationToken cancellationToken)
     {
-        return _userService.AddAsync(
+        var addedUser = await _userService.AddAsync(
             _mapper.MapCreationRequestToCreationModel(creationRequest),
             cancellationToken);
+
+        return _mapper.MapUserToResponse(addedUser);
     }
 
     [HttpGet("{id:guid}")]

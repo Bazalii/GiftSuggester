@@ -26,7 +26,7 @@ public class GroupService : IGroupService
         _groupValidator = groupValidator;
     }
 
-    public async Task AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken)
+    public async Task<Group> AddAsync(GroupCreationModel creationModel, CancellationToken cancellationToken)
     {
         var owner = await _userRepository.GetByIdAsync(creationModel.OwnerId, cancellationToken);
 
@@ -39,9 +39,11 @@ public class GroupService : IGroupService
 
         await _groupValidator.ValidateAndThrowAsync(group, cancellationToken);
 
-        await _groupRepository.AddAsync(group, cancellationToken);
+        var addedGroup = await _groupRepository.AddAsync(group, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return addedGroup;
     }
 
     public Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken)

@@ -21,11 +21,13 @@ public class GiftController
     }
 
     [HttpPost]
-    public Task AddAsync(GiftCreationRequest creationRequest, CancellationToken cancellationToken)
+    public async Task<GiftResponse> AddAsync(GiftCreationRequest creationRequest, CancellationToken cancellationToken)
     {
-        return _giftService.AddAsync(
+        var addedGift = await _giftService.AddAsync(
             _mapper.MapCreationRequestToCreationModel(creationRequest),
             cancellationToken);
+
+        return _mapper.MapGiftToResponse(addedGift);
     }
 
     [HttpGet("{groupId:guid}/{presenterId:guid}/{recipientId:guid}")]

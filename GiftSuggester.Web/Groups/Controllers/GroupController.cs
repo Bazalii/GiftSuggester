@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using GiftSuggester.Core.Groups.Models;
 using GiftSuggester.Core.Groups.Services;
 using GiftSuggester.Web.Groups.Mappers;
 using GiftSuggester.Web.Groups.Models;
@@ -21,11 +22,13 @@ public class GroupController
     }
 
     [HttpPost]
-    public Task AddAsync(GroupCreationRequest creationRequest, CancellationToken cancellationToken)
+    public async Task<GroupResponse> AddAsync(GroupCreationRequest creationRequest, CancellationToken cancellationToken)
     {
-        return _groupService.AddAsync(
+        var addedGroup = await _groupService.AddAsync(
             _mapper.MapCreationRequestToCreationModel(creationRequest),
             cancellationToken);
+
+        return _mapper.MapGroupToResponse(addedGroup);
     }
 
     [HttpGet("{id:guid}")]

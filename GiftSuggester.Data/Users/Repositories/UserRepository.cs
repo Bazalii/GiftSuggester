@@ -17,11 +17,12 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
-    public Task AddAsync(User user, CancellationToken cancellationToken)
+    public async Task<User> AddAsync(User user, CancellationToken cancellationToken)
     {
-        return _context.Users
-            .AddAsync(_mapper.MapUserToDbModel(user), cancellationToken)
-            .AsTask();
+        var entryEntity = await _context.Users
+            .AddAsync(_mapper.MapUserToDbModel(user), cancellationToken);
+
+        return _mapper.MapDbModelToUser(entryEntity.Entity);
     }
 
     public async Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken)

@@ -4,7 +4,7 @@ namespace GiftSuggester.Core.Gifts.Services;
 
 public interface IGiftService
 {
-    Task AddAsync(GiftCreationModel creationModel, CancellationToken cancellationToken);
+    Task<Gift> AddAsync(GiftCreationModel creationModel, CancellationToken cancellationToken);
 
     Task<Gift> GetByPresenterRecipientAndGroupAsync(Guid groupId, Guid presenterId, Guid recipientId,
                                                     CancellationToken cancellationToken);

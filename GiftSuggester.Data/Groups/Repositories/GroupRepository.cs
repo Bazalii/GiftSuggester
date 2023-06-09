@@ -17,11 +17,12 @@ public class GroupRepository : IGroupRepository
         _mapper = mapper;
     }
 
-    public Task AddAsync(Group group, CancellationToken cancellationToken)
+    public async Task<Group> AddAsync(Group group, CancellationToken cancellationToken)
     {
-        return _context.Groups
-            .AddAsync(_mapper.MapGroupToDbModel(group), cancellationToken)
-            .AsTask();
+        var entityEntry = await _context.Groups
+            .AddAsync(_mapper.MapGroupToDbModel(group), cancellationToken);
+
+        return _mapper.MapDbModelToGroup(entityEntry.Entity);
     }
 
     public async Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken)

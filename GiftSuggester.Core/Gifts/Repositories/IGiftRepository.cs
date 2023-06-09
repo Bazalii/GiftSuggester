@@ -4,7 +4,7 @@ namespace GiftSuggester.Core.Gifts.Repositories;
 
 public interface IGiftRepository
 {
-    Task AddAsync(Gift gift, CancellationToken cancellationToken);
+    Task<Gift> AddAsync(Gift gift, CancellationToken cancellationToken);
 
     Task<Gift> GetByPresenterRecipientAndGroupAsync(Guid groupId, Guid presenterId, Guid recipientId,
                                                     CancellationToken cancellationToken);

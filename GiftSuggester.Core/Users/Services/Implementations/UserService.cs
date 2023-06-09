@@ -29,15 +29,17 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task AddAsync(UserCreationModel creationModel, CancellationToken cancellationToken)
+    public async Task<User> AddAsync(UserCreationModel creationModel, CancellationToken cancellationToken)
     {
         var user = _mapper.MapCreationModelToUser(creationModel);
 
         await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
 
-        await _userRepository.AddAsync(user, cancellationToken);
+        var addedUser = await _userRepository.AddAsync(user, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return addedUser;
     }
 
     public Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken)

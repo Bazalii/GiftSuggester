@@ -17,11 +17,12 @@ public class GiftRepository : IGiftRepository
         _mapper = mapper;
     }
 
-    public Task AddAsync(Gift gift, CancellationToken cancellationToken)
+    public async Task<Gift> AddAsync(Gift gift, CancellationToken cancellationToken)
     {
-        return _context.Gifts
-            .AddAsync(_mapper.MapGiftToDbModel(gift), cancellationToken)
-            .AsTask();
+        var entityEntry = await _context.Gifts
+            .AddAsync(_mapper.MapGiftToDbModel(gift), cancellationToken);
+
+        return _mapper.MapDbModelToGift(entityEntry.Entity);
     }
 
     public async Task<Gift> GetByPresenterRecipientAndGroupAsync(Guid groupId, Guid presenterId, Guid recipientId,

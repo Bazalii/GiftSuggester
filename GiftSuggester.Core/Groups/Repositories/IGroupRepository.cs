@@ -4,7 +4,7 @@ namespace GiftSuggester.Core.Groups.Repositories;
 
 public interface IGroupRepository
 {
-    Task AddAsync(Group group, CancellationToken cancellationToken);
+    Task<Group> AddAsync(Group group, CancellationToken cancellationToken);
     Task<Group> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task AddUserToGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken);
     Task RemoveUserFromGroupAsync(Guid groupId, Guid userId, CancellationToken cancellationToken);
