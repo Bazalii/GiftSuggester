@@ -4,6 +4,7 @@ using GiftSuggester.Core.Exceptions;
 using GiftSuggester.Core.Users.Models;
 using GiftSuggester.Core.Users.Repositories;
 using GiftSuggester.Core.Users.Validators;
+using static BCrypt.Net.BCrypt;
 
 namespace GiftSuggester.Core.Users.Services.Implementations;
 
@@ -35,8 +36,9 @@ public class UserService : IUserService
 
         await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
 
-        var addedUser = await _userRepository.AddAsync(user, cancellationToken);
+        user.Password = EnhancedHashPassword(user.Password, Constants.BcryptWorkFactor);
 
+        var addedUser = await _userRepository.AddAsync(user, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return addedUser;
@@ -62,7 +64,6 @@ public class UserService : IUserService
         await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
 
         await _userRepository.UpdateAsync(user, cancellationToken);
-
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -70,22 +71,22 @@ public class UserService : IUserService
                                           CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user.Password != oldPassword)
+        {
+            throw new InvalidCredentialsException("Invalid old password!");
+        }
 
-        if (user.Password != oldPassword) throw new InvalidCredentialsException("Invalid old password!");
-
-        user.Password = newPassword;
+        user.Password = EnhancedHashPassword(newPassword, Constants.BcryptWorkFactor);
 
         await _userPasswordValidator.ValidateAndThrowAsync(user, cancellationToken);
 
         await _userRepository.UpdatePasswordAsync(id, newPassword, cancellationToken);
-
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         await _userRepository.RemoveByIdAsync(id, cancellationToken);
-
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
